@@ -41,12 +41,12 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(true)
   const [statusDialogOpen, setStatusDialogOpen] = useState(false)
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
-  const [newStatus, setNewStatus] = useState<OrderStatus>("pending")
+  const [newStatus, setNewStatus] = useState<OrderStatus>("PENDING")
   const [changingStatus, setChangingStatus] = useState(false)
 
   // Payment form
   const [paymentAmount, setPaymentAmount] = useState("")
-  const [paymentMethod, setPaymentMethod] = useState("cash")
+  const [paymentMethod, setPaymentMethod] = useState("CASH")
   const [paymentRef, setPaymentRef] = useState("")
   const [submittingPayment, setSubmittingPayment] = useState(false)
 
@@ -99,7 +99,7 @@ export default function OrderDetailPage() {
         body: JSON.stringify({
           amount: Number(paymentAmount),
           method: paymentMethod,
-          reference: paymentRef || "",
+          referenceNo: paymentRef || "",
         }),
       })
       if (!res.ok) throw new Error("Gagal mencatat pembayaran")
@@ -324,11 +324,11 @@ export default function OrderDetailPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pending">Menunggu</SelectItem>
-                <SelectItem value="processing">Diproses</SelectItem>
-                <SelectItem value="completed">Selesai</SelectItem>
-                <SelectItem value="delivered">Diambil</SelectItem>
-                <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                <SelectItem value="PENDING">Menunggu</SelectItem>
+                <SelectItem value="PROCESSING">Diproses</SelectItem>
+                <SelectItem value="DONE">Selesai</SelectItem>
+                <SelectItem value="PICKED_UP">Diambil</SelectItem>
+                <SelectItem value="CANCELLED">Dibatalkan</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -367,10 +367,10 @@ export default function OrderDetailPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cash">Tunai</SelectItem>
-                  <SelectItem value="transfer">Transfer</SelectItem>
-                  <SelectItem value="qris">QRIS</SelectItem>
-                  <SelectItem value="other">Lainnya</SelectItem>
+                  <SelectItem value="CASH">Tunai</SelectItem>
+                  <SelectItem value="TRANSFER">Transfer</SelectItem>
+                  <SelectItem value="QRIS">QRIS</SelectItem>
+                  <SelectItem value="OTHER">Lainnya</SelectItem>
                 </SelectContent>
               </Select>
             </div>

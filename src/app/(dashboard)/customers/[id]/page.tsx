@@ -121,7 +121,7 @@ export default function CustomerDetailPage() {
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Pesanan Aktif</span>
               <span className="font-medium">
-                {orders.filter((o) => o.status !== "delivered" && o.status !== "cancelled").length}
+                {orders.filter((o) => o.status !== "PICKED_UP" && o.status !== "CANCELLED").length}
               </span>
             </div>
           </CardContent>
@@ -183,19 +183,19 @@ export default function CustomerDetailPage() {
                     <td className="px-4 py-3">
                       <Badge
                         variant={
-                          order.paymentStatus === "paid"
+                          order.paymentStatus === "PAID"
                             ? "outline"
-                            : order.paymentStatus === "partial"
+                            : order.paymentStatus === "PARTIAL"
                               ? "secondary"
                               : "destructive"
                         }
                         className="text-xs"
                       >
-                        {order.paymentStatus === "paid"
+                        {order.paymentStatus === "PAID"
                           ? "Lunas"
-                          : order.paymentStatus === "partial"
+                          : order.paymentStatus === "PARTIAL"
                             ? "Sebagian"
-                            : "Belum Dibayar"}
+                            : "Belum Bayar"}
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">

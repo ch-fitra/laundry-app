@@ -5,18 +5,25 @@
 // ── Enums ────────────────────────────────────────────────────
 
 export type OrderStatus =
-  | "pending"       // Menunggu diambil/diantar
-  | "processing"    // Sedang dicuci
-  | "completed"     // Selesai, siap diambil
-  | "delivered"     // Sudah diantar/diambil
-  | "cancelled";    // Dibatalkan
+  | "PENDING"       // Menunggu
+  | "PROCESSING"    // Sedang dicuci
+  | "DONE"          // Selesai, siap diambil
+  | "NOTIFIED"      // Sudah dinotifikasi
+  | "PICKED_UP"     // Sudah diambil
+  | "CANCELLED";    // Dibatalkan
 
 export type PaymentStatus =
-  | "unpaid"
-  | "paid"
-  | "partial";
+  | "UNPAID"
+  | "PAID"
+  | "PARTIAL";
 
-export type UserRole = "admin" | "kasir" | "owner";
+export type PaymentMethod =
+  | "CASH"
+  | "TRANSFER"
+  | "QRIS"
+  | "OTHER";
+
+export type UserRole = "OWNER" | "STAFF";
 
 export type ServiceCategory = "laundry" | "dry_clean" | "ironing" | "other";
 

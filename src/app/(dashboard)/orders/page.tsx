@@ -63,11 +63,11 @@ interface OrdersResponse {
 
 const statusFilterOptions: { value: string; label: string }[] = [
   { value: "", label: "Semua Status" },
-  { value: "pending", label: "Menunggu" },
-  { value: "processing", label: "Diproses" },
-  { value: "completed", label: "Selesai" },
-  { value: "delivered", label: "Diambil" },
-  { value: "cancelled", label: "Dibatalkan" },
+  { value: "PENDING", label: "Menunggu" },
+  { value: "PROCESSING", label: "Diproses" },
+  { value: "DONE", label: "Selesai" },
+  { value: "PICKED_UP", label: "Diambil" },
+  { value: "CANCELLED", label: "Dibatalkan" },
 ]
 
 export default function OrdersPage() {
@@ -81,7 +81,7 @@ export default function OrdersPage() {
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [statusChangeId, setStatusChangeId] = useState<string | null>(null)
-  const [newStatus, setNewStatus] = useState<OrderStatus>("pending")
+  const [newStatus, setNewStatus] = useState<OrderStatus>("PENDING")
   const [changingStatus, setChangingStatus] = useState(false)
 
   const limit = 10
@@ -258,17 +258,17 @@ export default function OrdersPage() {
                     <TableCell>
                       <Badge
                         variant={
-                          order.paymentStatus === "paid"
+                          order.paymentStatus === "PAID"
                             ? "outline"
-                            : order.paymentStatus === "partial"
+                            : order.paymentStatus === "PARTIAL"
                               ? "secondary"
                               : "destructive"
                         }
                         className="text-xs"
                       >
-                        {order.paymentStatus === "paid"
+                        {order.paymentStatus === "PAID"
                           ? "Lunas"
-                          : order.paymentStatus === "partial"
+                          : order.paymentStatus === "PARTIAL"
                             ? "Sebagian"
                             : "Belum Dibayar"}
                       </Badge>
@@ -381,11 +381,11 @@ export default function OrdersPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pending">Menunggu</SelectItem>
-                <SelectItem value="processing">Diproses</SelectItem>
-                <SelectItem value="completed">Selesai</SelectItem>
-                <SelectItem value="delivered">Diambil</SelectItem>
-                <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                <SelectItem value="PENDING">Menunggu</SelectItem>
+                <SelectItem value="PROCESSING">Diproses</SelectItem>
+                <SelectItem value="DONE">Selesai</SelectItem>
+                <SelectItem value="PICKED_UP">Diambil</SelectItem>
+                <SelectItem value="CANCELLED">Dibatalkan</SelectItem>
               </SelectContent>
             </Select>
           </div>

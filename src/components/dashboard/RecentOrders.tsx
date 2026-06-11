@@ -20,19 +20,21 @@ interface RecentOrdersProps {
 }
 
 const statusLabel: Record<OrderStatus, string> = {
-  pending: "Menunggu",
-  processing: "Diproses",
-  completed: "Selesai",
-  delivered: "Diambil",
-  cancelled: "Dibatalkan",
+  PENDING: "Menunggu",
+  PROCESSING: "Diproses",
+  DONE: "Selesai",
+  NOTIFIED: "Dinotifikasi",
+  PICKED_UP: "Diambil",
+  CANCELLED: "Dibatalkan",
 }
 
 const statusVariant: Record<OrderStatus, "secondary" | "default" | "outline" | "destructive"> = {
-  pending: "secondary",
-  processing: "default",
-  completed: "outline",
-  delivered: "outline",
-  cancelled: "destructive",
+  PENDING: "secondary",
+  PROCESSING: "default",
+  DONE: "outline",
+  NOTIFIED: "outline",
+  PICKED_UP: "outline",
+  CANCELLED: "destructive",
 }
 
 export function RecentOrders({ orders }: RecentOrdersProps) {

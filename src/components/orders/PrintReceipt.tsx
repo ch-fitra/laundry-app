@@ -87,7 +87,7 @@ export function PrintReceipt({ order }: PrintReceiptProps) {
     </div>
     <div class="info-row">
       <span>Status Pembayaran</span>
-      <span class="${order.paymentStatus === "paid" ? "status-paid" : "status-unpaid"}">${order.paymentStatus === "paid" ? "LUNAS" : order.paymentStatus === "partial" ? "SEBAGIAN" : "BELUM DIBAYAR"}</span>
+      <span class="${order.paymentStatus === "PAID" ? "status-paid" : "status-unpaid"}">${order.paymentStatus === "PAID" ? "LUNAS" : order.paymentStatus === "PARTIAL" ? "SEBAGIAN" : "BELUM DIBAYAR"}</span>
     </div>
     <div class="divider"></div>
     <div class="footer">

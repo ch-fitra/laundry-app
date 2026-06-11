@@ -9,11 +9,12 @@ interface OrderStatusBadgeProps {
 }
 
 const statusConfig: Record<OrderStatus, { label: string; variant: "secondary" | "default" | "outline" | "destructive"; className?: string }> = {
-  pending: { label: "Menunggu", variant: "secondary" },
-  processing: { label: "Diproses", variant: "default" },
-  completed: { label: "Selesai", variant: "outline" },
-  delivered: { label: "Diambil", variant: "outline" },
-  cancelled: { label: "Dibatalkan", variant: "destructive" },
+  PENDING: { label: "Menunggu", variant: "secondary" },
+  PROCESSING: { label: "Diproses", variant: "default" },
+  DONE: { label: "Selesai", variant: "outline" },
+  NOTIFIED: { label: "Dinotifikasi", variant: "outline" },
+  PICKED_UP: { label: "Diambil", variant: "outline" },
+  CANCELLED: { label: "Dibatalkan", variant: "destructive" },
 }
 
 export function OrderStatusBadge({ status, size = "default" }: OrderStatusBadgeProps) {
@@ -35,9 +36,9 @@ export function getStatusLabel(status: OrderStatus): string {
 
 export function getPaymentStatusLabel(paymentStatus: string): string {
   const labels: Record<string, string> = {
-    unpaid: "Belum Dibayar",
-    paid: "Lunas",
-    partial: "Sebagian",
+    UNPAID: "Belum Dibayar",
+    PAID: "Lunas",
+    PARTIAL: "Sebagian",
   }
   return labels[paymentStatus] || paymentStatus
 }

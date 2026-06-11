@@ -89,10 +89,11 @@ export async function PATCH(
     if (notes !== undefined) updateData.notes = notes
     if (handledById !== undefined) updateData.handledById = handledById
     if (pickupDate !== undefined) updateData.pickupDate = pickupDate ? new Date(pickupDate) : null
-    if (totalWeight !== undefined) updateData.totalWeight = totalWeight
+    if (totalWeight !== undefined) updateData.totalWeight = Number(totalWeight)
     if (discount !== undefined) {
-      updateData.discount = discount
-      updateData.totalPrice = Number(order.subtotal) - discount
+      const disc = Number(discount)
+      updateData.discount = disc
+      updateData.totalPrice = Number(order.subtotal) - disc
     }
 
     const updatedOrder = await prisma.$transaction(async (tx) => {

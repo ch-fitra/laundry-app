@@ -1,0 +1,282 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────────────────────── ENUMS ─────────────────────────────
+
+enum Role {
+  OWNER
+  STAFF
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  DONE
+  NOTIFIED
+  PICKED_UP
+  CANCELLED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PARTIAL
+  PAID
+}
+
+enum PaymentMethod {
+  CASH
+  TRANSFER
+  QRIS
+  OTHER
+}
+
+// ───────────────────────────── AUTH (NextAuth v5) ─────────────────────────────
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ───────────────────────────── MASTER DATA ─────────────────────────────
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(STAFF)
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  outlet           Outlet?            @relation("OutletOwner")
+  accounts         Account[]
+  sessions         Session[]
+  handledOrders    Order[]            @relation("HandledBy")
+  recordedPayments Payment[]          @relation("RecordedBy")
+  recordedExpenses Expense[]          @relation("ExpenseRecordedBy")
+  statusChanges    OrderStatusHistory[]
+
+  @@map("users")
+}
+
+model Outlet {
+  id        String   @id @default(uuid())
+  ownerId   String   @unique
+  name      String
+  address   String?
+  phone     String?
+  whatsapp  String?
+  logoUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  owner     User       @relation("OutletOwner", fields: [ownerId], references: [id])
+  customers Customer[]
+  services  Service[]
+  orders    Order[]
+  expenses  Expense[]
+
+  @@map("outlets")
+}
+
+model Customer {
+  id          String   @id @default(uuid())
+  outletId    String
+  name        String
+  phone       String?
+  address     String?
+  totalOrders Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  outlet        Outlet         @relation(fields: [outletId], references: [id])
+  orders        Order[]
+  notifications Notification[]
+
+  @@index([outletId])
+  @@map("customers")
+}
+
+model Service {
+  id              String   @id @default(uuid())
+  outletId        String
+  name            String
+  unit            String   @default("kg")
+  pricePerUnit    Decimal  @db.Decimal(10, 2)
+  estDurationHours Int     @default(24)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  outlet     Outlet      @relation(fields: [outletId], references: [id])
+  orderItems OrderItem[]
+
+  @@index([outletId])
+  @@map("services")
+}
+
+// ───────────────────────────── TRANSAKSI ─────────────────────────────
+
+model Order {
+  id            String        @id @default(uuid())
+  orderCode     String        @unique
+  outletId      String
+  customerId    String
+  handledById   String?
+  pickupDate    DateTime?
+  estDoneDate   DateTime?
+  doneDate      DateTime?
+  status        OrderStatus   @default(PENDING)
+  totalWeight   Decimal?      @db.Decimal(8, 2)
+  subtotal      Decimal       @default(0) @db.Decimal(10, 2)
+  discount      Decimal       @default(0) @db.Decimal(10, 2)
+  totalPrice    Decimal       @default(0) @db.Decimal(10, 2)
+  paymentStatus PaymentStatus @default(UNPAID)
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  outlet        Outlet         @relation(fields: [outletId], references: [id])
+  customer      Customer       @relation(fields: [customerId], references: [id])
+  handledBy     User?          @relation("HandledBy", fields: [handledById], references: [id])
+  items         OrderItem[]
+  payments      Payment[]
+  notifications Notification[]
+  statusHistory OrderStatusHistory[]
+
+  @@index([outletId])
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  serviceId String
+  quantity  Decimal  @db.Decimal(8, 2)
+  unitPrice Decimal  @db.Decimal(10, 2)
+  subtotal  Decimal  @db.Decimal(10, 2)
+
+  // Relations
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id])
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model Payment {
+  id           String        @id @default(uuid())
+  orderId      String
+  amount       Decimal       @db.Decimal(10, 2)
+  method       PaymentMethod @default(CASH)
+  referenceNo  String?
+  paidAt       DateTime      @default(now())
+  recordedById String?
+
+  // Relations
+  order      Order @relation(fields: [orderId], references: [id])
+  recordedBy User? @relation("RecordedBy", fields: [recordedById], references: [id])
+
+  @@index([orderId])
+  @@map("payments")
+}
+
+model OrderStatusHistory {
+  id          String      @id @default(uuid())
+  orderId     String
+  fromStatus  OrderStatus?
+  toStatus    OrderStatus
+  changedById String?
+  note        String?
+  createdAt   DateTime    @default(now())
+
+  // Relations
+  order     Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  changedBy User? @relation(fields: [changedById], references: [id])
+
+  @@index([orderId])
+  @@map("order_status_history")
+}
+
+model Expense {
+  id           String   @id @default(uuid())
+  outletId     String
+  category     String
+  description  String?
+  amount       Decimal  @db.Decimal(10, 2)
+  expenseDate  DateTime @default(now())
+  recordedById String?
+
+  // Relations
+  outlet     Outlet @relation(fields: [outletId], references: [id])
+  recordedBy User?  @relation("ExpenseRecordedBy", fields: [recordedById], references: [id])
+
+  @@index([outletId])
+  @@index([expenseDate])
+  @@map("expenses")
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  orderId    String
+  customerId String
+  channel    String   @default("whatsapp")
+  message    String   @db.Text
+  status     String   @default("pending")
+  sentAt     DateTime?
+  createdAt  DateTime @default(now())
+
+  // Relations
+  order    Order    @relation(fields: [orderId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@index([orderId])
+  @@map("notifications")
+}
